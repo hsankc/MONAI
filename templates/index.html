@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MONAI · AI Infrastructure</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066FF;
+            --primary-light: #E6F0FF;
+            --accent-blue: #00B8FF;
+            --success: #00D66A;
+            --warning: #FFB800;
+            --text: #1A1A1A;
+            --text-secondary: #666666;
+            --border: #E5E5E5;
+            --bg: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --shadow: rgba(0, 0, 0, 0.08);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            20% {
+                left: 150%;
+            }
+
+            100% {
+                left: 150%;
+            }
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            background: #F8FAFC;
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            position: relative;
+        }
+
+        /* Shimmer animation on logo */
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -100%;
+            width: 50%;
+            height: 200%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.6),
+                    transparent);
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent-blue));
+            border-radius: 2px;
+        }
+
+        .testnet-badge {
+            padding: 4px 10px;
+            background: linear-gradient(135deg, #FFB800, #FFA000);
+            color: #000;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Shimmer animation on badge */
+        .testnet-badge::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -100%;
+            width: 50%;
+            height: 200%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.7),
+                    transparent);
+            animation: shimmer 3s infinite 0.5s;
+            pointer-events: none;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .test-mode {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .test-mode label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .toggle {
+            position: relative;
+            width: 42px;
+            height: 24px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #DDD;
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        input:checked+.toggle-slider {
+            background: var(--primary);
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(18px);
+        }
+
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #DDD;
+            border-radius: 50%;
+        }
+
+        .status-dot.connected {
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        #walletAddress.connected {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent-blue));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(1);
+        }
+
+        .btn.disconnect {
+            background: #FF3B30;
+        }
+
+        /* Grid - 2 columns for symmetry */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid rgba(0, 102, 255, 0.15);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fadeIn 0.5s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            position: relative;
+            z-index: 1;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 102, 255, 0.15);
+            transform: translateY(-8px) scale(1.01);
+            z-index: 2;
+        }
+
+        /* All cards equal - no featured */
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .card-price {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 6px 14px;
+            border-radius: 8px;
+        }
+
+        textarea,
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.2s;
+            background: var(--bg);
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+
+        input[type="file"]::file-selector-button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--primary), var(--accent-blue));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 12px;
+            transition: all 0.2s;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        textarea {
+            min-height: 140px;
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        ::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--accent-blue));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 12px 30px rgba(0, 102, 255, 0.3);
+        }
+
+        .action-btn:active {
+            transform: translateY(-1px) scale(1);
+        }
+
+        .response {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .response.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .response-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .response-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .response-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-secondary);
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Terminal */
+        .terminal {
+            grid-column: 1 / -1;
+            background: #1A1A1A;
+            border: 1px solid #2A2A2A;
+            border-radius: 16px;
+            padding: 20px;
+            max-height: 320px;
+            overflow-y: auto;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #2A2A2A;
+        }
+
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-red {
+            background: #FF3B30;
+        }
+
+        .dot-yellow {
+            background: #FFB800;
+        }
+
+        .dot-green {
+            background: #00D66A;
+        }
+
+        .terminal-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #888;
+            letter-spacing: 1px;
+            margin-left: 8px;
+        }
+
+        .terminal-content {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.8;
+            color: #CCC;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+        }
+
+        .log-timestamp {
+            color: #666;
+        }
+
+        .log-success {
+            color: #00D66A;
+        }
+
+        .log-error {
+            color: #FF3B30;
+        }
+
+        .log-data {
+            color: #0066FF;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #DDD;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #BBB;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-section">
+                <div class="logo">MONAI</div>
+                <span class="testnet-badge">TESTNET</span>
+            </div>
+            <div class="header-controls">
+                <div class="test-mode">
+                    <label for="testModeToggle">Test Mode</label>
+                    <label class="toggle">
+                        <input type="checkbox" id="testModeToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="wallet-status">
+                    <span class="status-dot" id="statusIndicator"></span>
+                    <span id="walletAddress">Not Connected</span>
+                </div>
+                <button class="btn" id="connectWalletBtn">Connect Wallet</button>
+            </div>
+        </header>
+
+        <div class="grid">
+            <!-- GPT-Pro -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🤖 GPT-Pro</div>
+                    <div class="card-price">0.003 MON</div>
+                </div>
+                <textarea id="gptInput" placeholder="Ask anything..."></textarea>
+                <button class="action-btn" onclick="useService('gpt-pro', 0.003)">Execute Query</button>
+                <div class="response" id="gptResponse">
+                    <div class="response-title">Response</div>
+                    <div class="response-text" id="gptResponseText"></div>
+                    <div class="response-meta" id="gptResponseMeta"></div>
+                </div>
+            </div>
+
+            <!-- Gemini AI -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🧠 Gemini AI</div>
+                    <div class="card-price">0.003 MON</div>
+                </div>
+                <textarea id="geminiInput" placeholder="Türkçe soru sorun..." rows="4"></textarea>
+                <button class="action-btn" onclick="useService('gemini-ai', 0.003)">Analyze</button>
+                <div class="response" id="geminiResponse">
+                    <div class="response-title">Analysis</div>
+                    <div class="response-text" id="geminiResponseText"></div>
+                    <div class="response-meta" id="geminiResponseMeta"></div>
+                </div>
+            </div>
+
+            <!-- BG Remover -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🖼️ BG Remover</div>
+                    <div class="card-price">0.003 MON</div>
+                </div>
+                <input type="file" id="bgInput" accept="image/*">
+                <button class="action-btn" onclick="useService('bg-remover', 0.003)">Remove Background</button>
+                <div class="response" id="bgResponse">
+                    <div class="response-title">Result</div>
+                    <div class="response-text" id="bgResponseText"></div>
+                    <div id="bgImageContainer" style="margin-top: 12px; display: none;">
+                        <img id="bgResultImage"
+                            style="max-width: 100%; border-radius: 10px; border: 1px solid var(--border);">
+                        <button class="action-btn" onclick="downloadBgImage()" style="margin-top: 12px;">Download
+                            Image</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image Generator -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🎨 Image Generator</div>
+                    <div class="card-price">0.003 MON</div>
+                </div>
+                <textarea id="imageInput" placeholder="Describe your image... (e.g., 'futuristic city at sunset')"
+                    rows="4"></textarea>
+                <button class="action-btn" onclick="useService('image-generator', 0.003)">Generate Image</button>
+                <div class="response" id="imageResponse">
+                    <div class="response-title">Generated Image</div>
+                    <div id="imageContainer" style="margin-top: 12px; display: none;">
+                        <img id="generatedImage"
+                            style="max-width: 100%; border-radius: 10px; border: 1px solid var(--border);">
+                        <div class="response-meta" id="imageResponseMeta" style="margin-top: 12px;"></div>
+                        <button class="action-btn" onclick="downloadImage()" style="margin-top: 12px;">Download
+                            Image</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal -->
+            <div class="card terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot dot-red"></div>
+                    <div class="terminal-dot dot-yellow"></div>
+                    <div class="terminal-dot dot-green"></div>
+                    <div class="terminal-title">SYSTEM LOGS</div>
+                </div>
+                <div class="terminal-content" id="terminalContent">
+                    <div class="log-entry">
+                        <span class="log-timestamp">[SYSTEM]</span>
+                        <span class="log-success"> ⚡ Monad Access initialized</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Ethers.js with multiple fallback CDNs -->
+    <script>
+        // Try loading from multiple CDNs
+        (function loadEthers() {
+            const cdns = [
+                'https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js',
+                'https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js',
+                'https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js'
+            ];
+
+            let currentCdn = 0;
+
+            function tryLoadScript() {
+                if (currentCdn >= cdns.length) {
+                    console.error('❌ All CDNs failed. Ethers.js could not be loaded.');
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = cdns[currentCdn];
+                script.async = false;
+
+                script.onload = function () {
+                    if (typeof ethers !== 'undefined') {
+                        console.log('✅ Ethers.js loaded from:', cdns[currentCdn]);
+                        console.log('Version:', ethers.version);
+                    }
+                };
+
+                script.onerror = function () {
+                    console.warn('Failed to load from:', cdns[currentCdn]);
+                    currentCdn++;
+                    tryLoadScript();
+                };
+
+                document.head.appendChild(script);
+            }
+
+            tryLoadScript();
+        })();
+    </script>
+
+    <script>
+        const CONTRACT_ADDRESS = "0xD1c273e4D5DEC949E4AD83Fd98DA3205122b281e";
+        const CONTRACT_ABI = [{ "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "enum MonadAccess.ServiceType", "name": "service", "type": "uint8" }, { "indexed": false, "internalType": "uint256", "name": "oldPrice", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "newPrice", "type": "uint256" }], "name": "PriceUpdated", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "user", "type": "address" }, { "indexed": true, "internalType": "enum MonadAccess.ServiceType", "name": "service", "type": "uint8" }, { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256" }], "name": "ServicePurchased", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256" }], "name": "Withdrawal", "type": "event" }, { "inputs": [{ "internalType": "enum MonadAccess.ServiceType", "name": "service", "type": "uint8" }], "name": "getPrice", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "enum MonadAccess.ServiceType", "name": "service", "type": "uint8" }], "name": "payForService", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [{ "internalType": "enum MonadAccess.ServiceType", "name": "", "type": "uint8" }], "name": "servicePrices", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "enum MonadAccess.ServiceType", "name": "service", "type": "uint8" }, { "internalType": "uint256", "name": "newPrice", "type": "uint256" }], "name": "updatePrice", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "withdraw", "outputs": [], "stateMutability": "nonpayable", "type": "function" }];
+
+        const ServiceType = {
+            'gpt-pro': 0,
+            'gemini-ai': 1,
+            'bg-remover': 2,
+            'image-generator': 3
+        };
+
+        let provider, signer, userAddress, contract;
+        let testMode = true;
+        const ADMIN_ADDRESS = '0x864EdC950468f3d1e1F103fd13DaD7D79dcD8b0C';
+
+        // Wait for page and ethers to be ready
+        function initializeApp() {
+            if (typeof ethers === 'undefined') {
+                console.error('Ethers.js not loaded yet, retrying...');
+                setTimeout(initializeApp, 100);
+                return;
+            }
+
+            addLog('SUCCESS', 'Monad Access initialized');
+            addLog('INFO', 'Test Mode is ACTIVE');
+
+            document.getElementById('gptInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    useService('gpt-pro', 0.005);
+                }
+            });
+
+            document.getElementById('geminiInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    useService('gemini-ai', 0.003);
+                }
+            });
+        }
+
+        // Start initialization when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+        document.getElementById('testModeToggle').addEventListener('change', (e) => {
+            testMode = e.target.checked;
+            addLog(testMode ? 'INFO' : 'WARNING', testMode ? 'Test Mode ENABLED' : 'Test Mode DISABLED');
+        });
+
+        document.getElementById('connectWalletBtn').addEventListener('click', async () => {
+            if (userAddress) {
+                disconnectWallet();
+                return;
+            }
+
+            if (typeof window.ethereum === 'undefined') {
+                addLog('ERROR', 'MetaMask not detected! Please install MetaMask.');
+                alert('Please install MetaMask extension');
+                return;
+            }
+
+            try {
+                addLog('INFO', 'Requesting MetaMask connection...');
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                if (!accounts || accounts.length === 0) {
+                    throw new Error('No accounts found');
+                }
+
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+
+                const MONAD_CHAIN_ID = '0x279f';
+                const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
+
+                if (currentChainId !== MONAD_CHAIN_ID) {
+                    addLog('INFO', 'Switching to Monad Testnet...');
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: MONAD_CHAIN_ID }],
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: MONAD_CHAIN_ID,
+                                    chainName: 'Monad Testnet',
+                                    nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 },
+                                    rpcUrls: ['https://testnet-rpc.monad.xyz/'],
+                                    blockExplorerUrls: ['https://testnet.monadexplorer.com/']
+                                }],
+                            });
+                        } else {
+                            throw switchError;
+                        }
+                    }
+                }
+
+                const shortAddress = `${userAddress.substring(0, 6)}...${userAddress.substring(38)}`;
+                document.getElementById('walletAddress').textContent = shortAddress;
+                document.getElementById('walletAddress').classList.add('connected');
+                document.getElementById('statusIndicator').classList.add('connected');
+                document.getElementById('connectWalletBtn').textContent = 'Disconnect';
+                document.getElementById('connectWalletBtn').classList.add('disconnect');
+
+                if (CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000") {
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                    addLog('SUCCESS', 'Smart contract initialized');
+                }
+
+                addLog('SUCCESS', `Wallet connected: ${shortAddress}`);
+            } catch (error) {
+                addLog('ERROR', error.code === 4001 ? 'Connection rejected' : `Failed: ${error.message}`);
+            }
+        });
+
+        function disconnectWallet() {
+            userAddress = null;
+            provider = null;
+            signer = null;
+            contract = null;
+
+            document.getElementById('walletAddress').textContent = 'Not Connected';
+            document.getElementById('walletAddress').classList.remove('connected');
+            document.getElementById('statusIndicator').classList.remove('connected');
+            document.getElementById('connectWalletBtn').textContent = 'Connect Wallet';
+            document.getElementById('connectWalletBtn').classList.remove('disconnect');
+
+            addLog('INFO', 'Wallet disconnected');
+        }
+
+        async function useService(service, amount) {
+            if (testMode) {
+                addLog('INFO', `[TEST MODE] ${service} initiated`);
+                addLog('SUCCESS', `[TEST MODE] Payment skipped (${amount} MON)`);
+                await callServiceAPI(service);
+                return;
+            }
+
+            if (!userAddress) {
+                addLog('ERROR', 'Please connect wallet first!');
+                return;
+            }
+
+            try {
+                addLog('INFO', `Initiating ${service}...`);
+
+                if (!contract) {
+                    const tx = await signer.sendTransaction({
+                        to: ADMIN_ADDRESS,
+                        value: ethers.utils.parseEther(amount.toString())
+                    });
+                    addLog('SUCCESS', `TX: ${tx.hash}`);
+                    await tx.wait();
+                    addLog('SUCCESS', '✅ Confirmed!');
+                } else {
+                    // Map services to existing contract enums
+                    // Use index 1 (0.003 MON) for everything to keep it uniform as requested
+                    let serviceTypeId = 1;
+
+                    if (service === 'gpt-pro') {
+                        serviceTypeId = 1;
+                    } else if (service === 'gemini-ai') {
+                        serviceTypeId = 1;
+                    } else if (service === 'bg-remover') {
+                        serviceTypeId = 1;
+                    } else if (service === 'image-generator') {
+                        serviceTypeId = 1;
+                    }
+
+                    // RPC Retry Helper
+                    const retryOperation = async (fn, retries = 3, delay = 2000) => {
+                        for (let i = 0; i < retries; i++) {
+                            try {
+                                return await fn();
+                            } catch (error) {
+                                // Check for rate limit keywords in both error message and data
+                                const errorMessage = (error.message || '').toLowerCase();
+                                const errorData = JSON.stringify(error).toLowerCase();
+
+                                if (i < retries - 1 && (
+                                    errorMessage.includes('rate limit') ||
+                                    errorMessage.includes('429') ||
+                                    errorData.includes('rate limit')
+                                )) {
+                                    addLog('WARNING', `⚠️ Network busy, retrying (${i + 1}/${retries})...`);
+                                    await new Promise(res => setTimeout(res, delay * (i + 1)));
+                                    continue;
+                                }
+                                throw error;
+                            }
+                        }
+                    };
+
+                    const price = await retryOperation(() => contract.getPrice(serviceTypeId));
+                    addLog('INFO', `Paying ${ethers.utils.formatEther(price)} MON (via Service ID ${serviceTypeId})...`);
+
+                    const tx = await retryOperation(() => contract.payForService(serviceTypeId, { value: price }));
+
+                    addLog('SUCCESS', `TX: ${tx.hash}`);
+                    const receipt = await tx.wait();
+                    addLog('SUCCESS', `✅ Paid ${ethers.utils.formatEther(price)} MON`);
+                }
+
+                await callServiceAPI(service);
+            } catch (error) {
+                addLog('ERROR', error.code === 4001 ? 'TX rejected' : `Failed: ${error.message}`);
+            }
+        }
+
+        async function callServiceAPI(service) {
+            let endpoint = '', payload = {};
+
+            switch (service) {
+                case 'gpt-pro':
+                    endpoint = '/api/gpt-pro';
+                    payload = { query: document.getElementById('gptInput').value };
+                    break;
+                case 'gemini-ai':
+                    endpoint = '/api/gemini-ai';
+                    payload = { query: document.getElementById('geminiInput').value };
+                    break;
+                case 'bg-remover':
+                    endpoint = '/api/bg-remover';
+                    const fileInput = document.getElementById('bgInput');
+                    if (!fileInput.files[0]) {
+                        addLog('ERROR', 'Please select an image!');
+                        return;
+                    }
+                    break;
+                case 'image-generator':
+                    endpoint = '/api/image-generator';
+                    payload = { prompt: document.getElementById('imageInput').value || 'futuristic city at sunset, cyberpunk, neon lights' };
+                    break;
+            }
+
+            try {
+                addLog('INFO', `Calling ${service} API...`);
+
+                let response;
+                if (service === 'bg-remover') {
+                    const formData = new FormData();
+                    formData.append('image', document.getElementById('bgInput').files[0]);
+                    response = await fetch(endpoint, { method: 'POST', body: formData });
+                } else {
+                    response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                }
+
+                const data = await response.json();
+                displayServiceResult(service, data);
+            } catch (error) {
+                addLog('ERROR', `API failed: ${error.message}`);
+            }
+        }
+
+        function displayServiceResult(service, data) {
+            addLog('SUCCESS', `${data.service} completed!`);
+
+            switch (service) {
+                case 'gpt-pro':
+                    document.getElementById('gptResponseText').textContent = data.response;
+                    document.getElementById('gptResponseMeta').innerHTML = `Tokens: ${data.tokens_used} | Model: ${data.model} | ${data.real_api ? '✅ Real' : '⚠️ Fallback'}`;
+                    document.getElementById('gptResponse').classList.add('visible');
+                    break;
+
+                case 'gemini-ai':
+                    document.getElementById('geminiResponseText').textContent = data.analysis;
+                    document.getElementById('geminiResponseMeta').innerHTML = `Güven: ${(data.confidence_score * 100).toFixed(0)}% | ${data.real_api ? '✅ Real' : '⚠️ Fallback'}`;
+                    document.getElementById('geminiResponse').classList.add('visible');
+                    break;
+
+                case 'bg-remover':
+                    if (data.success && data.image_data) {
+                        document.getElementById('bgResultImage').src = `data:image/png;base64,${data.image_data}`;
+                        document.getElementById('bgImageContainer').style.display = 'block';
+                        document.getElementById('bgResponseText').textContent = '✅ Background removed!';
+                    } else {
+                        document.getElementById('bgResponseText').textContent = data.message || 'Failed';
+                    }
+                    document.getElementById('bgResponse').classList.add('visible');
+                    break;
+
+                case 'image-generator':
+                    console.log('Image Generator Response:', data);
+                    if (data.success && data.image_data) {
+                        console.log('Image data length:', data.image_data.length);
+                        document.getElementById('generatedImage').src = `data:image/jpeg;base64,${data.image_data}`;
+                        document.getElementById('imageContainer').style.display = 'block';
+                        document.getElementById('imageResponseMeta').innerHTML = `Model: ${data.model} | ${data.real_api ? '✅ Real' : '⚠️ Fallback'}`;
+                        addLog('SUCCESS', 'Image displayed!');
+                    } else {
+                        addLog('ERROR', data.message || 'Image generation failed');
+                    }
+                    document.getElementById('imageResponse').classList.add('visible');
+                    break;
+            }
+        }
+
+        function downloadImage() {
+            const img = document.getElementById('generatedImage');
+            const link = document.createElement('a');
+            link.href = img.src;
+            link.download = 'monad-generated-image.jpg';
+            link.click();
+            addLog('SUCCESS', 'Image downloaded!');
+        }
+
+        function downloadBgImage() {
+            const img = document.getElementById('bgResultImage');
+            const link = document.createElement('a');
+            link.href = img.src;
+            link.download = 'monad-bg-removed.png';
+            link.click();
+            addLog('SUCCESS', 'Image downloaded!');
+        }
+
+        function addLog(type, message) {
+            const terminal = document.getElementById('terminalContent');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+
+            const timestamp = new Date().toLocaleTimeString();
+            let logClass = '';
+
+            switch (type) {
+                case 'SUCCESS': logClass = 'log-success'; break;
+                case 'ERROR': logClass = 'log-error'; break;
+                case 'DATA': logClass = 'log-data'; break;
+                default: logClass = '';
+            }
+
+            logEntry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> <span class="${logClass}">${message}</span>`;
+            terminal.appendChild(logEntry);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>

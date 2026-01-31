@@ -1,0 +1,18 @@
+# Environment files
+.env
+.env.local
+
+# Dependencies
+node_modules/
+
+# Hardhat files
+cache/
+artifacts/
+
+# Python
+__pycache__/
+*.pyc
+
+# Contract deployment info
+contract-address.json
+contract-abi.json
